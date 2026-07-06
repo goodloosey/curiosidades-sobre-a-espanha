@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz da Espanha</title>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    #esp {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        z-index: -1;
+        object-position: center 50%;
+    }
+
+    body {
+        position: relative;
+        min-height: 100vh;
+        overflow-y: hidden;
+        overflow-x: hidden;
+        margin: 0;
+    }
+
+    .texto1c {
+        position: absolute;
+        top: 35%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: sans-serif;
+        font-size: 32px;
+        color: white;
+        text-align: center;
+    }
+
+    #butao1, #butao2 {
+        margin-bottom: 112px;
+        height: 50px;
+        width: 100px;
+        background-color: orangered;
+        border: none;
+        border-radius: 6px;
+        font-family: sans-serif;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    #butao1 {
+        position: absolute;
+        top: 60%;
+        left: 40%;
+        transform: translate(-50%, -50%);
+    }
+
+    #butao2 {
+        position: absolute;
+        top: 60%;
+        left: 60%;
+        transform: translate(-50%, -50%);
+    }
+
+    #quizBox {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(255, 255, 255, 0.92);
+        padding: 30px 40px;
+        border-radius: 12px;
+        font-family: sans-serif;
+        text-align: center;
+        width: 420px;
+        max-width: 90vw;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    #contador {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 8px;
+    }
+
+    #textoPergunta {
+        font-size: 22px;
+        margin: 10px 0 20px 0;
+        color: #222;
+    }
+
+    #inputResposta {
+        width: 90%;
+        padding: 8px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-bottom: 15px;
+    }
+
+    #botaoMandar {
+        background-color: orangered;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    #botaoMandar:hover {
+        background-color: #d64000;
+    }
+
+    #resultadoTexto {
+        margin-top: 15px;
+        font-size: 15px;
+        min-height: 20px;
+    }
+
+    .certo {
+        color: green;
+        font-weight: bold;
+    }
+
+    .errado {
+        color: crimson;
+        font-weight: bold;
+    }
+
+    #telaFinal h1 {
+        color: #222;
+    }
+
+    #telaFinal p {
+        color: #333;
+        font-size: 18px;
+    }
+
+    #botaoReiniciar {
+        background-color: orangered;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+</style>
+</head>
+<body>
+
+    <img src="bandeira_da_Espanha.jpg" id="esp" title="euteodeio">
+
+    <div class="menu" id="menu">
+        <div class="texto1c">
+            <h1 id="texto">Menu da Espanha</h1>
+        </div>
+        <input type="button" value="sair" onclick="sair()" id="butao1">
+        <input type="button" value="jogar" onclick="jogar()" id="butao2">
+    </div>
+
+    <script>
+        // ---------- BANCO DE PERGUNTAS ----------
+        const perguntas = [
+            {
+                texto: "Qual é a comida típica da Espanha?",
+                respostas: ["paella"]
+            },
+            {
+                texto: "Qual é o esporte mais famoso da Espanha?",
+                respostas: ["futebol", "tourada"]
+            },
+            {
+                texto: "O que as cores da bandeira da Espanha significam?",
+                respostas: ["sangue e ouro", "sangue", "ouro", "sangue derramado e ouro conquistado"]
+            },
+            {
+                texto: "Quais são as cores da bandeira da Espanha?",
+                respostas: ["vermelho e amarelo", "amarelo e vermelho"]
+            },
+            {
+                texto: "Quantas Copas do Mundo a Espanha já participou?",
+                respostas: ["16", "dezesseis"]
+            },
+            {
+                texto: "Qual estilo de música os espanhóis mais gostam?",
+                respostas: ["flamenco"]
+            },
+            {
+                texto: "No que os espanhóis mais trabalham lá?",
+                respostas: ["turismo", "servicos", "serviços"]
+            },
+            {
+                texto: "Quantos anos a Espanha tem (desde sua unificação em 1492)?",
+                respostas: gerarRespostasIdade()
+            },
+            {
+                texto: "Qual é a capital da Espanha?",
+                respostas: ["madri", "madrid"]
+            },
+            {
+                texto: "O que o brasão da Espanha significa?",
+                respostas: ["reinos", "os reinos historicos", "uniao dos reinos", "união dos reinos", "castela leao aragao e navarra", "castela, leao, aragao e navarra"]
+            },
+            {
+                texto: "Qual é o animal representante da Espanha?",
+                respostas: ["touro", "toro"]
+            },
+            {
+                texto: "Quem é o melhor artilheiro da seleção espanhola?",
+                respostas: ["david villa", "lamine yamal"]
+            },
+            {
+                texto: "Qual é o melhor time de futebol da Espanha?",
+                respostas: ["real madrid", "barcelona", "fc barcelona"]
+            },
+            {
+                texto: "Como/por quem a Espanha foi unificada?",
+                respostas: ["reis catolicos", "reis católicos", "fernando e isabel", "isabel e fernando"]
+            },
+            {
+                texto: "Quais são os ingredientes principais da paella?",
+                respostas: ["arroz frango e frutos do mar", "arroz, frango e frutos do mar", "arroz frango frutos do mar", "arroz"]
+            }
+        ];
+
+        function gerarRespostasIdade() {
+            const anoAtual = new Date().getFullYear();
+            const idade = anoAtual - 1492;
+            return [String(idade)];
+        }
+
+        let indiceAtual = 0;
+        let acertos = 0;
+
+        function sair() {
+            window.open('about:blank', '_blank');
+        }
+
+        function jogar() {
+            document.getElementById("menu").remove();
+            indiceAtual = 0;
+            acertos = 0;
+            criarTelaQuiz();
+            mostrarPergunta();
+        }
+
+        function criarTelaQuiz() {
+            const corpo = document.body;
+
+            const quizBox = document.createElement("div");
+            quizBox.id = "quizBox";
+
+            const contador = document.createElement("div");
+            contador.id = "contador";
+
+            const textoPergunta = document.createElement("h2");
+            textoPergunta.id = "textoPergunta";
+
+            const inputResposta = document.createElement("input");
+            inputResposta.id = "inputResposta";
+            inputResposta.type = "text";
+            inputResposta.placeholder = "Digite sua resposta aqui";
+
+            const botaoMandar = document.createElement("button");
+            botaoMandar.id = "botaoMandar";
+            botaoMandar.innerText = "Mandar";
+
+            const resultadoTexto = document.createElement("p");
+            resultadoTexto.id = "resultadoTexto";
+
+            quizBox.appendChild(contador);
+            quizBox.appendChild(textoPergunta);
+            quizBox.appendChild(inputResposta);
+            quizBox.appendChild(botaoMandar);
+            quizBox.appendChild(resultadoTexto);
+            corpo.appendChild(quizBox);
+
+            botaoMandar.addEventListener("click", conferirResposta);
+            inputResposta.addEventListener("keydown", function (evento) {
+                if (evento.key === "Enter") {
+                    conferirResposta();
+                }
+            });
+        }
+
+        function mostrarPergunta() {
+            const pergunta = perguntas[indiceAtual];
+
+            const contador = document.getElementById("contador");
+            const textoPergunta = document.getElementById("textoPergunta");
+            const inputResposta = document.getElementById("inputResposta");
+            const resultadoTexto = document.getElementById("resultadoTexto");
+
+            contador.textContent = "Pergunta " + (indiceAtual + 1) + " de " + perguntas.length;
+            textoPergunta.textContent = pergunta.texto;
+            inputResposta.value = "";
+            resultadoTexto.textContent = "";
+            resultadoTexto.className = "";
+            inputResposta.focus();
+        }
+
+        function conferirResposta() {
+            const inputResposta = document.getElementById("inputResposta");
+            const resultadoTexto = document.getElementById("resultadoTexto");
+            const pergunta = perguntas[indiceAtual];
+
+            const valorDigitado = inputResposta.value.trim().toLowerCase();
+            const acertou = pergunta.respostas.some(function (resposta) {
+                return resposta.toLowerCase() === valorDigitado;
+            });
+
+            if (acertou) {
+                acertos++;
+                resultadoTexto.textContent = "Certo!";
+                resultadoTexto.className = "certo";
+                setTimeout(proximaPergunta, 800);
+            } else {
+                resultadoTexto.textContent = "Tente novamente!";
+                resultadoTexto.className = "errado";
+            }
+        }
+
+        function proximaPergunta() {
+            indiceAtual++;
+            if (indiceAtual < perguntas.length) {
+                mostrarPergunta();
+            } else {
+                mostrarTelaFinal();
+            }
+        }
+
+        function mostrarTelaFinal() {
+            const quizBox = document.getElementById("quizBox");
+            quizBox.innerHTML = "";
+
+            const telaFinal = document.createElement("div");
+            telaFinal.id = "telaFinal";
+
+            const titulo = document.createElement("h1");
+            titulo.textContent = "Quiz finalizado!";
+
+            const resultado = document.createElement("p");
+            resultado.textContent = "Você acertou " + acertos + " de " + perguntas.length + " perguntas.";
+
+            const botaoReiniciar = document.createElement("button");
+            botaoReiniciar.id = "botaoReiniciar";
+            botaoReiniciar.textContent = "Jogar de novo";
+            botaoReiniciar.addEventListener("click", function () {
+                indiceAtual = 0;
+                acertos = 0;
+                quizBox.innerHTML = "";
+                criarTelaQuizNovamente(quizBox);
+            });
+
+            telaFinal.appendChild(titulo);
+            telaFinal.appendChild(resultado);
+            telaFinal.appendChild(botaoReiniciar);
+            quizBox.appendChild(telaFinal);
+        }
+
+        function criarTelaQuizNovamente(quizBox) {
+            const contador = document.createElement("div");
+            contador.id = "contador";
+
+            const textoPergunta = document.createElement("h2");
+            textoPergunta.id = "textoPergunta";
+
+            const inputResposta = document.createElement("input");
+            inputResposta.id = "inputResposta";
+            inputResposta.type = "text";
+            inputResposta.placeholder = "Digite sua resposta aqui";
+
+            const botaoMandar = document.createElement("button");
+            botaoMandar.id = "botaoMandar";
+            botaoMandar.innerText = "Mandar";
+
+            const resultadoTexto = document.createElement("p");
+            resultadoTexto.id = "resultadoTexto";
+
+            quizBox.appendChild(contador);
+            quizBox.appendChild(textoPergunta);
+            quizBox.appendChild(inputResposta);
+            quizBox.appendChild(botaoMandar);
+            quizBox.appendChild(resultadoTexto);
+
+            botaoMandar.addEventListener("click", conferirResposta);
+            inputResposta.addEventListener("keydown", function (evento) {
+                if (evento.key === "Enter") {
+                    conferirResposta();
+                }
+            });
+
+            mostrarPergunta();
+        }
+    </script>
+</body>
+</html>
